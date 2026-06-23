@@ -158,7 +158,7 @@ def main() -> None:
 
     bird = Bird((300, 200))
     bombs = [Bomb((255, 0, 0), 10) for _ in range(NUM_OF_BOMBS)]
-    beam = None
+    beams = []
     score = Score()
 
     while True:
@@ -174,12 +174,13 @@ def main() -> None:
 
         # 爆弾とビームの衝突判定
         for i, bomb in enumerate(bombs):
-            if beam is not None:
+            for j, beam in enumerate(beams):
                 if beam.rct.colliderect(bomb.rct):
                     bird.change_img(9, screen)
                     score.value += 1
-                    beam = None
                     bombs[i] = None
+                    beams[j] = None
+                    break
 
         # こうかとんと爆弾の衝突判定
         for bomb in bombs:
@@ -196,18 +197,20 @@ def main() -> None:
                     return
 
         bombs = [bomb for bomb in bombs if bomb is not None]
+        beams = [beam for beam in beams if beam is not None]
+        beams = [beam for beam in beams if check_bound(beam.rct) == (True, True)]
 
         key_lst = pg.key.get_pressed()
 
         if space_down:
-            beam = Beam(bird)
+            beams.append(Beam(bird))
 
         bird.update(key_lst, screen)
 
         for bomb in bombs:
             bomb.update(screen)
 
-        if beam is not None:
+        for beam in beams:
             beam.update(screen)
 
         score.update(screen)
