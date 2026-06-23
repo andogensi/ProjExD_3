@@ -122,6 +122,30 @@ class Score:
         screen.blit(self.img, self.rct)
 
 
+class Explosion:
+    """
+    爆弾を撃ち落としたときの爆発エフェクトクラス
+    """
+
+    def __init__(self, bomb):
+        img = pg.image.load("fig/explosion.gif")
+        self.imgs = [
+            img,
+            pg.transform.flip(img, True, True),
+        ]
+
+        self.rct = self.imgs[0].get_rect()
+        self.rct.center = bomb.rct.center
+
+        self.life = 20
+
+    def update(self, screen: pg.Surface) -> None:
+        self.life -= 1
+
+        if self.life > 0:
+            screen.blit(self.imgs[self.life % 2], self.rct)
+
+
 class Bomb:
     """
     爆弾に関するクラス
@@ -159,6 +183,7 @@ def main() -> None:
     bird = Bird((300, 200))
     bombs = [Bomb((255, 0, 0), 10) for _ in range(NUM_OF_BOMBS)]
     beams = []
+    exps = []
     score = Score()
 
     while True:
@@ -178,6 +203,7 @@ def main() -> None:
                 if beam.rct.colliderect(bomb.rct):
                     bird.change_img(9, screen)
                     score.value += 1
+                    exps.append(Explosion(bomb))
                     bombs[i] = None
                     beams[j] = None
                     break
@@ -199,6 +225,7 @@ def main() -> None:
         bombs = [bomb for bomb in bombs if bomb is not None]
         beams = [beam for beam in beams if beam is not None]
         beams = [beam for beam in beams if check_bound(beam.rct) == (True, True)]
+        exps = [exp for exp in exps if exp.life > 0]
 
         key_lst = pg.key.get_pressed()
 
@@ -212,6 +239,9 @@ def main() -> None:
 
         for beam in beams:
             beam.update(screen)
+
+        for exp in exps:
+            exp.update(screen)
 
         score.update(screen)
 
