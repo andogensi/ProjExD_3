@@ -206,7 +206,11 @@ def main() -> None:
 
         # 爆弾とビームの衝突判定
         for i, bomb in enumerate(bombs):
+            if bomb is None:
+                continue
             for j, beam in enumerate(beams):
+                if beam is None:
+                    continue
                 if beam.rct.colliderect(bomb.rct):
                     bird.change_img(9, screen)
                     score.value += 1
