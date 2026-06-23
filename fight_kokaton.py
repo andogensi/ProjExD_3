@@ -55,7 +55,7 @@ class Bird:
     }
 
     def __init__(self, xy: tuple[int, int]):
-        self.img = __class__.imgs[(0, 0)]
+        self.img = Bird.imgs[(0, 0)]
         self.rct = self.img.get_rect()
         self.rct.center = xy
         self.dire = (+5, 0)
@@ -67,7 +67,7 @@ class Bird:
     def update(self, key_lst: pg.key.ScancodeWrapper, screen: pg.Surface) -> None:
         sum_mv = [0, 0]
 
-        for key, mv in __class__.delta.items():
+        for key, mv in Bird.delta.items():
             if key_lst[key]:
                 sum_mv[0] += mv[0]
                 sum_mv[1] += mv[1]
@@ -83,7 +83,7 @@ class Bird:
         if sum_mv != [0, 0]:
             self.dire = tuple(sum_mv)
 
-        self.img = __class__.imgs[tuple(sum_mv)]
+        self.img = Bird.imgs[tuple(sum_mv)]
         screen.blit(self.img, self.rct)
 
 
