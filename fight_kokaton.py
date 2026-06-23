@@ -8,6 +8,7 @@ import pygame as pg
 
 WIDTH = 1100
 HEIGHT = 650
+NUM_OF_BOMBS = 5
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
@@ -137,7 +138,7 @@ def main() -> None:
     clock = pg.time.Clock()
 
     bird = Bird((300, 200))
-    bomb = Bomb((255, 0, 0), 10)
+    bombs = [Bomb((255, 0, 0), 10) for _ in range(NUM_OF_BOMBS)]
     beam = None
 
     while True:
@@ -152,25 +153,28 @@ def main() -> None:
         screen.blit(bg_img, [0, 0])
 
         # 爆弾とビームの衝突判定
-        if bomb is not None:
+        for i, bomb in enumerate(bombs):
             if beam is not None:
                 if beam.rct.colliderect(bomb.rct):
                     bird.change_img(9, screen)
                     beam = None
-                    bomb = None
+                    bombs[i] = None
 
         # こうかとんと爆弾の衝突判定
-        if bomb is not None:
-            if bird.rct.colliderect(bomb.rct):
-                bird.change_img(8, screen)
+        for bomb in bombs:
+            if bomb is not None:
+                if bird.rct.colliderect(bomb.rct):
+                    bird.change_img(8, screen)
 
-                fonto = pg.font.Font(None, 80)
-                txt = fonto.render("Game Over", True, (255, 0, 0))
-                screen.blit(txt, [WIDTH // 2 - 150, HEIGHT // 2])
+                    fonto = pg.font.Font(None, 80)
+                    txt = fonto.render("Game Over", True, (255, 0, 0))
+                    screen.blit(txt, [WIDTH // 2 - 150, HEIGHT // 2])
 
-                pg.display.update()
-                time.sleep(1)
-                return
+                    pg.display.update()
+                    time.sleep(1)
+                    return
+
+        bombs = [bomb for bomb in bombs if bomb is not None]
 
         key_lst = pg.key.get_pressed()
 
@@ -179,7 +183,7 @@ def main() -> None:
 
         bird.update(key_lst, screen)
 
-        if bomb is not None:
+        for bomb in bombs:
             bomb.update(screen)
 
         if beam is not None:
