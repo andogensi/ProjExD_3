@@ -1,3 +1,4 @@
+import math
 import os
 import random
 import sys
@@ -57,6 +58,7 @@ class Bird:
         self.img = __class__.imgs[(0, 0)]
         self.rct = self.img.get_rect()
         self.rct.center = xy
+        self.dire = (+5, 0)
 
     def change_img(self, num: int, screen: pg.Surface) -> None:
         self.img = pg.transform.rotozoom(pg.image.load(f"fig/{num}.png"), 0, 0.9)
@@ -78,6 +80,9 @@ class Bird:
         if not tate:
             self.rct.move_ip(0, -sum_mv[1])
 
+        if sum_mv != [0, 0]:
+            self.dire = tuple(sum_mv)
+
         self.img = __class__.imgs[tuple(sum_mv)]
         screen.blit(self.img, self.rct)
 
@@ -88,14 +93,16 @@ class Beam:
     """
 
     def __init__(self, bird: Bird):
-        self.img = pg.image.load("fig/beam.png")
+        self.vx, self.vy = bird.dire
+
+        img = pg.image.load("fig/beam.png")
+        rad = math.atan2(-self.vy, self.vx)
+        deg = math.degrees(rad)
+        self.img = pg.transform.rotozoom(img, deg, 1.0)
+
         self.rct = self.img.get_rect()
-
-        # ビームの左座標が，こうかとんの右座標になるように配置
-        self.rct.left = bird.rct.right
-        self.rct.centery = bird.rct.centery
-
-        self.vx, self.vy = +5, 0
+        self.rct.centerx = bird.rct.centerx + bird.rct.width * self.vx // 5
+        self.rct.centery = bird.rct.centery + bird.rct.height * self.vy // 5
 
     def update(self, screen: pg.Surface) -> None:
         if check_bound(self.rct) == (True, True):
