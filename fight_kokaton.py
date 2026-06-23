@@ -103,6 +103,25 @@ class Beam:
             screen.blit(self.img, self.rct)
 
 
+class Score:
+    """
+    打ち落とした爆弾の数を表示するスコアクラス
+    """
+
+    def __init__(self):
+        self.fonto = pg.font.Font(None, 50)
+        self.color = (0, 0, 255)
+        self.value = 0
+
+        self.img = self.fonto.render(f"Score: {self.value}", 0, self.color)
+        self.rct = self.img.get_rect()
+        self.rct.center = (100, HEIGHT - 50)
+
+    def update(self, screen: pg.Surface) -> None:
+        self.img = self.fonto.render(f"Score: {self.value}", 0, self.color)
+        screen.blit(self.img, self.rct)
+
+
 class Bomb:
     """
     爆弾に関するクラス
@@ -140,6 +159,7 @@ def main() -> None:
     bird = Bird((300, 200))
     bombs = [Bomb((255, 0, 0), 10) for _ in range(NUM_OF_BOMBS)]
     beam = None
+    score = Score()
 
     while True:
         space_down = False
@@ -157,6 +177,7 @@ def main() -> None:
             if beam is not None:
                 if beam.rct.colliderect(bomb.rct):
                     bird.change_img(9, screen)
+                    score.value += 1
                     beam = None
                     bombs[i] = None
 
@@ -188,6 +209,8 @@ def main() -> None:
 
         if beam is not None:
             beam.update(screen)
+
+        score.update(screen)
 
         pg.display.update()
         clock.tick(50)
